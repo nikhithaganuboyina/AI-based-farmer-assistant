@@ -17,3 +17,4 @@ deep-translator
 legacy-cgi; python_version >= '3.13'
 google-generativeai
 feedparser
+gunicorn
