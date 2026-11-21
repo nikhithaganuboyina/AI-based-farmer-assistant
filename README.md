@@ -1,3 +1,13 @@
+---
+title: AI Based Farmer Assistant Platform
+emoji: 🌾
+colorFrom: green
+colorTo: emerald
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 <h1 align="center">🌱 AI Based Farmer Assistant Platform</h1>
 
 <p align="center">
