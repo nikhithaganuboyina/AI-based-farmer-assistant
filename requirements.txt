@@ -13,5 +13,7 @@ flask
 google-generativeai
 python-dotenv
 sentence-transformers
-googletrans==4.0.0-rc1
-
+deep-translator
+legacy-cgi; python_version >= '3.13'
+google-generativeai
+feedparser

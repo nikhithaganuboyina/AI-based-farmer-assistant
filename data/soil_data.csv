@@ -4,16 +4,10 @@ Clay,"High nutrient retention, good water holding capacity","Poor drainage, comp
 Sandy,"Excellent drainage, easy root penetration",Low nutrient and water retention,"Groundnut, Carrot, Potato, Watermelon",Frequent light fertilization recommended,Mulching helps reduce moisture loss
 Silty,"Good fertility, smooth texture, retains moisture well",Erosion-prone,"Rice, Pulses, Oilseeds",Use cover crops to prevent erosion,Monitor drainage to prevent root diseases
 Black,"Rich in clay and nutrients, good moisture retention",Poor drainage when wet,"Cotton, Soybean, Sorghum",Nitrogen and phosphorus supplementation beneficial,Ensure proper drainage management
-soil_type,advantages,limitations,best_crops,fertilizer_tips,pest_management
-Loamy,"Highly fertile, good drainage","Needs nutrient maintenance","Wheat, Rice, Sugarcane, Vegetables","Balanced NPK + compost","General IPM"
-Clay,"High nutrient retention","Poor drainage","Paddy, Broccoli","Add organic matter","Avoid waterlogging"
-Sandy,"Excellent drainage","Low fertility","Groundnut, Carrot","Frequent light feeding","Mulching recommended"
-Silty,"Good fertility, smooth texture","Erosion-prone","Rice, Pulses","Use cover crops","Monitor drainage"
-Black,"Rich in minerals","Poor drainage when wet","Cotton, Soybean","Nitrogen & phosphorus","Ensure aeration"
-Red,"Well-drained","Low nitrogen","Millets, Groundnut","Add compost + NPK","Monitor pests"
-Laterite,"Rich in iron","Low fertility","Cashew, Coconut","Heavy manuring","Soil conditioning"
-Alluvial,"Very fertile","Can be sandy in parts","Rice, Wheat","Balanced fertilization","Regular monitoring"
-Desert,"Quick drainage","Low moisture","Bajra, Dates","Organic matter needed","Water conservation"
-Mountain,"Rich organic matter","Erosion risk","Tea, Spices","Terrace farming nutrients","Slope management"
-Peaty,"High organic content","Acidic","Rice, Jute","Lime treatment","Fungal monitoring"
-Saline,"Mineral rich","High salt","Barley, Cotton","Gypsum treatment","Salt management"
+Red,"Well-drained and porous texture","Low nitrogen and humus content","Millets, Groundnut, Pulses, Tobacco",Add organic compost + NPK fertilization,Regularly monitor for soil pests
+Laterite,"Rich in iron and aluminum oxides","Low fertility and acidic nature","Cashew, Coconut, Rubber, Coffee",Heavy manuring and lime application recommended,Maintain proper drainage and mulching
+Alluvial,"Extremely fertile and rich in potash","Can be sandy in upper reaches","Rice, Wheat, Sugarcane, Jute",Balanced NPK application,Regular monitoring for stem borers
+Desert,"Quick drainage and aerated","Low moisture and organic matter","Bajra, Dates, Pulses, Barley",Organic matter and drip irrigation needed,Water conservation and windbreak shelterbelts
+Mountain,"Rich in organic humus and minerals","High erosion risk on steep slopes","Tea, Coffee, Spices, Apples",Terrace farming nutrition and balanced compost,Slope management and soil conservation
+Peaty,"Very high organic matter content","Acidic and waterlogged","Rice, Jute, Vegetables",Lime treatment to reduce soil acidity,Fungal monitoring and drainage management
+Saline,"Rich in minerals but high soluble salt","Impairs root water uptake","Barley, Cotton, Beetroot",Gypsum treatment and salt leaching,Maintain adequate drainage systems

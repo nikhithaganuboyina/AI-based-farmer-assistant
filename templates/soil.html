@@ -77,20 +77,19 @@ color:#2ecc71;
 <h2>🌱 {{ text.soil_title }}</h2>
 
 <select id="soilSelect" onchange="loadSoilData()">
-
+<option value="">-- {{ text.select_soil }} --</option>
 <option value="Loamy">{{ translate("Loamy") }}</option>
 <option value="Clay">{{ translate("Clay") }}</option>
 <option value="Sandy">{{ translate("Sandy") }}</option>
 <option value="Silty">{{ translate("Silty") }}</option>
-<option value="Black (Regur)">{{ translate("Black (Regur)") }}</option>
+<option value="Black">{{ translate("Black (Regur)") }}</option>
 <option value="Red">{{ translate("Red") }}</option>
 <option value="Laterite">{{ translate("Laterite") }}</option>
 <option value="Alluvial">{{ translate("Alluvial") }}</option>
-<option value="Desert / Arid">{{ translate("Desert / Arid") }}</option>
-<option value="Mountain / Forest">{{ translate("Mountain / Forest") }}</option>
-<option value="Peaty / Marshy">{{ translate("Peaty / Marshy") }}</option>
-<option value="Saline / Alkaline">{{ translate("Saline / Alkaline") }}</option>
-
+<option value="Desert">{{ translate("Desert / Arid") }}</option>
+<option value="Mountain">{{ translate("Mountain / Forest") }}</option>
+<option value="Peaty">{{ translate("Peaty / Marshy") }}</option>
+<option value="Saline">{{ translate("Saline / Alkaline") }}</option>
 </select>
 
 <div id="soilResult"></div>
@@ -103,51 +102,35 @@ color:#2ecc71;
 async function loadSoilData(){
 
 const soil=document.getElementById("soilSelect").value;
-
 const resultBox=document.getElementById("soilResult");
 
 if(!soil){
-
 resultBox.innerHTML="";
 return;
-
 }
 
 resultBox.innerHTML="🌿 {{ text.loading_soil }}";
 
 try{
 
-const res=await fetch(`/get-soil?soil=${soil}`);
-
+const res=await fetch(`/get-soil?soil=${encodeURIComponent(soil)}`);
 const data=await res.json();
 
 if(data.error){
-
 resultBox.innerHTML=`<div class="card">${data.error}</div>`;
 return;
-
 }
 
 resultBox.innerHTML=`
-
 <div class="card"><span class="label">✅ {{ text.advantages }}:</span><br>${data.advantages}</div>
-
 <div class="card"><span class="label">⚠️ {{ text.limitations }}:</span><br>${data.limitations}</div>
-
 <div class="card"><span class="label">🌾 {{ text.best_crops }}:</span><br>${data.best_crops}</div>
-
 <div class="card"><span class="label">🧪 {{ text.fertilizer_tips }}:</span><br>${data.fertilizer_tips}</div>
-
 <div class="card"><span class="label">🐛 {{ text.pest_management }}:</span><br>${data.pest_management}</div>
-
 `;
 
-}
-
-catch(err){
-
+}catch(err){
 resultBox.innerHTML=`<div class="card">⚠️ {{ text.error_loading_soil }}</div>`;
-
 }
 
 }

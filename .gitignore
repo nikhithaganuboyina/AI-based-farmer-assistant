@@ -216,3 +216,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Local cache & uploaded test images
+.keras/
+models/old_*
+static/uploads/*
+!static/uploads/images.jpg
+!static/uploads/images_1.jpg
+!static/uploads/test_leaf.jpg
+!static/uploads/test_leaf2.jpg
+

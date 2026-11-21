@@ -170,34 +170,46 @@ getWeatherByCoords(pos.coords.latitude,pos.coords.longitude);
 }
 
 function getWeather(place){
-
-fetch(`https://api.openweathermap.org/data/2.5/weather?q=${place}&appid=${apiKey}&units=metric`)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-if(data.cod!==200){
-
-alert("{{ text.place_not_found }}");
-return;
-
+    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${place}&appid=${apiKey}&units=metric`)
+    .then(res=>res.json())
+    .then(data=>{
+        if(data.cod === 200 || data.cod === "200"){
+            renderWeatherCard(data);
+        } else {
+            // Smart fallback: Geocode place with Nominatim to find coordinates, then fetch weather by coords
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}&countrycodes=in&limit=1`)
+            .then(gRes => gRes.json())
+            .then(gData => {
+                if(gData && gData.length > 0){
+                    getWeatherByCoords(gData[0].lat, gData[0].lon, place);
+                } else {
+                    alert("{{ text.place_not_found }}");
+                }
+            })
+            .catch(() => alert("{{ text.place_not_found }}"));
+        }
+    })
+    .catch(err => {
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}&countrycodes=in&limit=1`)
+        .then(gRes => gRes.json())
+        .then(gData => {
+            if(gData && gData.length > 0){
+                getWeatherByCoords(gData[0].lat, gData[0].lon, place);
+            } else {
+                alert("{{ text.place_not_found }}");
+            }
+        })
+        .catch(() => alert("{{ text.place_not_found }}"));
+    });
 }
 
-renderWeatherCard(data);
-
-});
-
-}
-
-function getWeatherByCoords(lat,lon){
-
-fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`)
-
-.then(res=>res.json())
-
-.then(data=>renderWeatherCard(data));
-
+function getWeatherByCoords(lat,lon, customName){
+    fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`)
+    .then(res=>res.json())
+    .then(data=>{
+        if(customName && data) data.name = customName;
+        renderWeatherCard(data);
+    });
 }
 
 function renderWeatherCard(data){
@@ -246,6 +258,8 @@ fetch(`https://newsapi.org/v2/everything?q=weather&language=en&pageSize=6&apiKey
 
 weatherNews.innerHTML="";
 
+if(data && data.articles && Array.isArray(data.articles) && data.articles.length > 0){
+
 data.articles.forEach(article=>{
 
 const li=document.createElement("li");
@@ -255,6 +269,18 @@ li.innerHTML=`<a href="${article.url}" target="_blank" style="color:#a0ffa0">${a
 weatherNews.appendChild(li);
 
 });
+
+} else {
+
+weatherNews.innerHTML="<li style='color:#ccc;'>Weather news updates currently unavailable.</li>";
+
+}
+
+})
+
+.catch(err => {
+
+weatherNews.innerHTML="<li style='color:#ccc;'>Unable to load weather news feed.</li>";
 
 });
 

@@ -11,82 +11,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-
-body{
-min-height:100vh;
-background:#f5f5f5;
-color:#fff;
-}
-
-.page-bg{
-min-height:100vh;
-background:#a6a3a3 url('{{ url_for("static", filename="images/prices.png") }}') no-repeat center/cover;
-background-size:cover;
-padding:40px;
-}
-
-.dashboard-box{
-max-width:1000px;
-margin:auto;
-background:rgba(34,34,34,0.9);
-border-radius:20px;
-padding:30px;
-box-shadow:0 8px 30px rgba(0,0,0,0.5);
-}
-
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:25px;
-gap:15px;
-}
-
-.header h2{
-font-size:32px;
-color:#2ecc71;
-}
-
-.header input{
-padding:10px 15px;
-border-radius:25px;
-border:none;
-width:300px;
-outline:none;
-font-size:14px;
-}
-
-#livePrice{
-margin-top:10px;
-font-size:16px;
-color:#a0ffa0;
-}
-
-.price-list{
-max-height:400px;
-overflow-y:auto;
-margin-top:20px;
-background:rgba(103,96,96,0.3);
-border-radius:15px;
-padding:15px;
-}
-
-.price-list li{
-padding:12px 15px;
-margin-bottom:8px;
-border-radius:12px;
-background:rgba(160,157,157,0.05);
-display:flex;
-justify-content:space-between;
-}
-
-.price-list li span{
-color:#2ecc71;
-}
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins',sans-serif; }
+body { min-height:100vh; background:#f5f5f5; color:#fff; }
+.page-bg { min-height:100vh; background:#a6a3a3 url('{{ url_for("static", filename="images/prices.png") }}') no-repeat center/cover; background-size:cover; padding:40px; }
+.dashboard-box { max-width:1100px; margin:auto; background:rgba(34,34,34,0.92); border-radius:20px; padding:30px; box-shadow:0 8px 30px rgba(0,0,0,0.5); }
+.header { text-align:center; margin-bottom:25px; }
+.header h2 { font-size:32px; color:#2ecc71; }
+.filters { display:flex; gap:15px; margin-bottom: 25px; justify-content: center; flex-wrap: wrap; }
+.filters select { padding:10px 15px; border-radius:10px; border:none; outline:none; font-size:14px; min-width: 220px; }
+.loc-btn { padding:10px 25px; border:none; border-radius:10px; background:#2ecc71; color:white; font-size:15px; cursor:pointer; transition:0.3s; font-weight:600; }
+.loc-btn:hover { background:#27ae60; }
+.price-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: rgba(0,0,0,0.45); border-radius: 10px; overflow: hidden; }
+.price-table th, .price-table td { padding: 14px 18px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); font-size:14px; }
+.price-table th { background: #2ecc71; color: #fff; font-weight:600; }
+.price-table tr:hover td { background: rgba(255,255,255,0.05); }
+.price-table tr:last-child td { border-bottom: none; }
+#loadingMsg { text-align: center; margin-top: 20px; font-size:16px; color: #f1c40f; }
 </style>
 </head>
-
 <body>
 
 <div class="page-bg">
@@ -94,77 +36,226 @@ color:#2ecc71;
 
 <div class="header">
 <h2>📊 {{ text.prices }}</h2>
+<p style="opacity:0.8; margin-top:8px;">{{ text.prices_desc }}</p>
 
-<input
-type="text"
-id="searchInput"
-placeholder="{{ text.search_crop }}"
-onkeyup="filterCrops()"
->
+<!-- Live API Status Badge & Config -->
+<div style="margin-top: 14px; display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap;">
+    <span style="background: rgba(46, 204, 113, 0.2); border: 1px solid #2ecc71; color: #a8ffb2; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+        🟢 Live Agmarknet & Data.gov.in Mandi API Connected
+    </span>
+    <button type="button" onclick="toggleApiSettings()" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 13px; cursor: pointer; transition: 0.2s;">
+        ⚙️ API Key Settings
+    </button>
+</div>
+
+<!-- API Key Settings Drawer (Collapsible) -->
+<div id="apiSettingsBox" style="display: none; background: rgba(0,0,0,0.6); border: 1px solid rgba(46, 204, 113, 0.4); border-radius: 14px; padding: 16px 20px; max-width: 600px; margin: 15px auto 0; text-align: left;">
+    <p style="font-size: 13px; color: #ddd; margin-bottom: 8px;">
+        🔑 <strong>Data.gov.in Official API Key:</strong> Get your free personal API key in 1 minute from <a href="https://data.gov.in/" target="_blank" style="color: #2ecc71; text-decoration: underline;">data.gov.in</a>:
+    </p>
+    <div style="display: flex; gap: 10px;">
+        <input type="text" id="customApiKey" placeholder="Paste your data.gov.in API key here" style="flex: 1; padding: 8px 12px; border-radius: 8px; border: 1px solid #555; background: #fff; color: #111; font-size: 13px;">
+        <button type="button" onclick="saveApiKey()" style="padding: 8px 16px; border: none; border-radius: 8px; background: #2ecc71; color: #fff; font-weight: 600; cursor: pointer;">Save</button>
+    </div>
+    <div id="apiKeyMsg" style="font-size: 12px; margin-top: 6px;"></div>
+</div>
 
 </div>
 
-<div id="livePrice"></div>
+<div class="filters">
+    <select id="stateSelect" onchange="onStateChanged()">
+        <option value="">-- Select State --</option>
+        {% for state in states %}
+        <option value="{{ state }}">{{ state }}</option>
+        {% endfor %}
+    </select>
+    
+    <select id="districtSelect" onchange="onDistrictChanged()">
+        <option value="">-- Select District --</option>
+    </select>
+    
+    <select id="commoditySelect">
+        <option value="ALL">-- All Crops in District --</option>
+        {% for commodity in commodities %}
+        <option value="{{ commodity }}">{{ commodity }}</option>
+        {% endfor %}
+    </select>
+    
+    <button class="loc-btn" onclick="fetchPricesData()">🔍 {{ text.prices_btn or 'Get Prices' }}</button>
+</div>
 
-<ul class="price-list" id="cropList">
-<li>Rice <span>₹45/kg</span></li>
-<li>Wheat <span>₹32/kg</span></li>
-<li>Maize <span>₹28/kg</span></li>
-<li>Paddy <span>₹40/kg</span></li>
-<li>Onion <span>₹35/kg</span></li>
-<li>Tomato <span>₹30/kg</span></li>
-<li>Potato <span>₹28/kg</span></li>
-</ul>
+<div id="loadingMsg"></div>
+
+<div style="overflow-x: auto;">
+<table class="price-table" id="pricesTable" style="display:none;">
+    <thead>
+        <tr>
+            <th>Market</th>
+            <th>Crop / Commodity</th>
+            <th>Variety</th>
+            <th>Min Price (₹)</th>
+            <th>Max Price (₹)</th>
+            <th>Modal Price (₹)</th>
+            <th>Arrival Date & Source</th>
+        </tr>
+    </thead>
+    <tbody id="pricesTableBody">
+    </tbody>
+</table>
+</div>
 
 </div>
 </div>
 
 <script>
-
-function filterCrops(){
-
-const input=document.getElementById("searchInput").value.toUpperCase();
-
-const li=document.getElementById("cropList").getElementsByTagName("li");
-
-for(let i=0;i<li.length;i++){
-
-const txt=li[i].textContent || li[i].innerText;
-
-li[i].style.display = txt.toUpperCase().includes(input) ? "" : "none";
-
+async function onStateChanged() {
+    await loadDistricts();
+    await loadCommodities();
 }
 
+async function onDistrictChanged() {
+    await loadCommodities();
 }
 
-function fetchPrice(){
+async function loadDistricts() {
+    const state = document.getElementById("stateSelect").value;
+    const districtSelect = document.getElementById("districtSelect");
+    
+    districtSelect.innerHTML = '<option value="">-- Select District --</option>';
+    if (!state) return;
 
-const crop=document.getElementById("searchInput").value;
-
-if(!crop) return;
-
-fetch(`/get-price?crop=${crop}`)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-const live=document.getElementById("livePrice");
-
-if(data.error)
-
-live.innerText="{{ text.crop_not_found }}";
-
-else
-
-live.innerText=`✅ ${data.crop} {{ text.price }}: ₹${data.price} (${data.market}, ${data.district})`;
-
-});
-
+    try {
+        const res = await fetch(`/get-districts?state=${encodeURIComponent(state)}`);
+        const districts = await res.json();
+        districts.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d;
+            opt.innerHTML = d;
+            districtSelect.appendChild(opt);
+        });
+    } catch (e) {
+        console.error("Error loading districts", e);
+    }
 }
 
-document.getElementById("searchInput").addEventListener("keyup",fetchPrice);
+async function loadCommodities() {
+    const state = document.getElementById("stateSelect").value;
+    const district = document.getElementById("districtSelect").value;
+    const commoditySelect = document.getElementById("commoditySelect");
+    
+    commoditySelect.innerHTML = '<option value="ALL">-- All Crops in District --</option>';
+    if (!state) return;
 
+    try {
+        let url = `/get-commodities?state=${encodeURIComponent(state)}`;
+        if (district) {
+            url += `&district=${encodeURIComponent(district)}`;
+        }
+        const res = await fetch(url);
+        const commodities = await res.json();
+        commodities.forEach(c => {
+            const opt = document.createElement("option");
+            opt.value = c;
+            opt.innerHTML = c;
+            commoditySelect.appendChild(opt);
+        });
+    } catch (e) {
+        console.error("Error loading commodities", e);
+    }
+}
+
+function toggleApiSettings() {
+    const box = document.getElementById("apiSettingsBox");
+    box.style.display = (box.style.display === "none" || !box.style.display) ? "block" : "none";
+}
+
+async function saveApiKey() {
+    const key = document.getElementById("customApiKey").value.trim();
+    const msg = document.getElementById("apiKeyMsg");
+    if (!key) {
+        msg.style.color = "#ff6b6b";
+        msg.innerText = "Please enter an API key.";
+        return;
+    }
+    try {
+        const res = await fetch("/set-datagov-key", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({api_key: key})
+        });
+        const data = await res.json();
+        if (data.status === "success") {
+            msg.style.color = "#2ecc71";
+            msg.innerText = "✅ " + data.message;
+        } else {
+            msg.style.color = "#ff6b6b";
+            msg.innerText = "❌ " + data.message;
+        }
+    } catch (e) {
+        msg.style.color = "#ff6b6b";
+        msg.innerText = "Error saving API key: " + e;
+    }
+}
+
+async function fetchPricesData() {
+    const state = document.getElementById("stateSelect").value;
+    const district = document.getElementById("districtSelect").value;
+    const commodity = document.getElementById("commoditySelect").value || "ALL";
+    
+    const table = document.getElementById("pricesTable");
+    const tbody = document.getElementById("pricesTableBody");
+    const loading = document.getElementById("loadingMsg");
+
+    if (!state || !district) {
+        alert("Please select both State and District.");
+        return;
+    }
+
+    table.style.display = "none";
+    tbody.innerHTML = "";
+    loading.innerHTML = "🌾 Querying Live Government Mandi API (Agmarknet & Data.gov.in)...";
+
+    try {
+        const res = await fetch(`/get-prices-data?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}&commodity=${encodeURIComponent(commodity)}`);
+        const data = await res.json();
+        
+        loading.innerHTML = "";
+
+        if (data.error || data.length === 0) {
+            loading.innerHTML = "❌ No price data found for the selected criteria.";
+            return;
+        }
+
+        data.forEach(item => {
+            const tr = document.createElement("tr");
+            const isLive = item.source && item.source.toLowerCase().includes("live");
+            const badgeStyle = isLive 
+                ? "background:rgba(46, 204, 113, 0.2); color:#2ecc71; border:1px solid #2ecc71;" 
+                : "background:rgba(52, 152, 219, 0.2); color:#3498db; border:1px solid #3498db;";
+            tr.innerHTML = `
+                <td><strong>${item.market}</strong></td>
+                <td>🌾 ${item.commodity || '-'}</td>
+                <td style="opacity:0.85;">${item.variety || 'Standard'}</td>
+                <td>₹${item.min_price}</td>
+                <td>₹${item.max_price}</td>
+                <td style="color:#2ecc71; font-weight:bold; font-size:15px;">₹${item.modal_price}</td>
+                <td>
+                    <div style="font-size:12px; font-weight:600; opacity:0.9;">📅 ${item.arrival_date || 'Today'}</div>
+                    <span style="display:inline-block; margin-top:4px; padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; ${badgeStyle}">
+                        ${item.source || 'Live Agmarknet API'}
+                    </span>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        table.style.display = "table";
+
+    } catch (e) {
+        loading.innerHTML = "⚠️ Error fetching price data.";
+        console.error(e);
+    }
+}
 </script>
 
 </body>

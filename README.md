@@ -15,7 +15,8 @@ AI Based Farmer Assistant Platform is an AI-powered web application that helps f
 
 ## Crop Leaf Disease Prediction
 
-* Detects crop leaf diseases using AI and machine Learning
+* Detects crop leaf diseases across 38 crop categories using MobileNetV2 Deep Learning
+* **Smart Non-Leaf Filter:** Automatically blocks green walls, green cloth, green plastic, neon screens, and random non-leaf objects using texture and chlorophyll spectrum checks
 * Helps farmers identify diseases quickly and accurately
 * Supports better crop management and productivity
 
@@ -61,7 +62,7 @@ flowchart TD
 
 ## Farmer Support Chatbot
 
-* Rule-based chatbot system for farmer assistance
+* AI-powered agricultural assistant powered by Google Gemini 2.5 Flash with fallback to local semantic search
 * Answers common farming-related queries
 * Provides farming guidance and support
 

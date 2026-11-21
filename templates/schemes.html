@@ -42,12 +42,12 @@ h2 {
 
 .scheme-card {
   background-color: #e3ebe3;
-  border-left: 5px solid #e8efe8;
+  border-left: 5px solid #2ecc71;
   border-radius: 8px;
-  padding: 1rem;
-  margin: 1rem 0;
+  padding: 1.2rem;
+  margin: 1.2rem 0;
   display: flex;
-  gap: 1rem;
+  gap: 1.2rem;
   align-items: center;
   transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -65,9 +65,13 @@ h2 {
 .scheme-info h3 {
   margin: 0;
   color: #256a24;
+  font-size: 1.2rem;
 }
 .scheme-info p {
   margin: 0.5rem 0;
+  color: #333;
+  font-size: 0.95rem;
+  line-height: 1.4;
 }
 .scheme-info a {
   color: #053145;
@@ -90,6 +94,7 @@ h2 {
   border-radius: 5px;
   cursor: pointer;
   transition: 0.3s;
+  font-size: 1rem;
 }
 .state-select button:hover {
   background-color: #4CAF50;
@@ -115,7 +120,7 @@ h2 {
         <h3>{{ text.pmkisan_title }}</h3>
         <p>{{ text.pmkisan_desc }}</p>
         <a href="https://pmkisan.gov.in/" target="_blank">
-          {{ text.official_site }}
+          {{ text.official_site }} &rarr;
         </a>
       </div>
     </div>
@@ -126,7 +131,7 @@ h2 {
         <h3>{{ text.pmfby_title }}</h3>
         <p>{{ text.pmfby_desc }}</p>
         <a href="https://pmfby.gov.in/" target="_blank">
-          {{ text.official_site }}
+          {{ text.official_site }} &rarr;
         </a>
       </div>
     </div>
@@ -137,7 +142,7 @@ h2 {
         <h3>{{ text.soilhealth_title }}</h3>
         <p>{{ text.soilhealth_desc }}</p>
         <a href="https://soilhealth.dac.gov.in/home" target="_blank">
-          {{ text.official_site }}
+          {{ text.official_site }} &rarr;
         </a>
       </div>
     </div>
@@ -148,29 +153,31 @@ h2 {
     <h2>{{ text.select_state }}</h2>
 
     <div class="state-select">
-      <button onclick="showStateSchemes('{{ translate("Kerala") }}')">
-        {{ translate("Kerala") }}
+      {% for state_name in schemes_json.keys() %}
+      <button onclick="showStateSchemes('{{ state_name }}')">
+        {{ state_name }}
       </button>
-
-      <button onclick="showStateSchemes('{{ translate("Tamil Nadu") }}')">
-        {{ translate("Tamil Nadu") }}
-      </button>
-
-      <button onclick="showStateSchemes('{{ translate("Karnataka") }}')">
-        {{ translate("Karnataka") }}
-      </button>
-
-      <button onclick="showStateSchemes('{{ translate("Andhra Pradesh") }}')">
-        {{ translate("Andhra Pradesh") }}
-      </button>
-
-      <button onclick="showStateSchemes('{{ translate("Telangana") }}')">
-        {{ translate("Telangana") }}
-      </button>
+      {% endfor %}
     </div>
   </section>
 
   <section id="stateSchemes"></section>
+
+  {% if news_list %}
+  <!-- LATEST AGRICULTURE NEWS & SCHEME UPDATES -->
+  <section style="margin-top: 2.5rem;">
+    <h2>📢 {{ translate("Latest Agriculture News & Updates") }}</h2>
+    <div style="background: rgba(227, 235, 227, 0.95); border-radius: 8px; padding: 1.5rem; margin: 1rem 0;">
+      <ul style="list-style-type: none; padding-left: 0; margin: 0;">
+        {% for news in news_list %}
+        <li style="padding: 10px 0; border-bottom: 1px solid #d4ded4; font-size: 1rem; color: #191a19;">
+          🌾 {{ news }}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
 
 </div>
 
@@ -180,6 +187,7 @@ const schemes = {{ schemes_json | tojson }};
 // ✅ Translated labels injected from Flask
 const TEXTS = {
   schemes_label: "{{ text.schemes }}",
+  official_site: "{{ text.official_site or 'Official Website' }}",
   details_label: "{{ translate('Scheme details available at official portal') }}"
 };
 
@@ -189,15 +197,22 @@ function showStateSchemes(state){
   box.innerHTML = `<h2>${state} ${TEXTS.schemes_label}</h2>`;
 
   if (!schemes[state]) {
-    box.innerHTML += `<p>No schemes available</p>`;
+    box.innerHTML += `<p style="text-align:center; padding:15px;">No schemes available for ${state}</p>`;
     return;
   }
 
   schemes[state].forEach(s=>{
+    const name = s.name || s;
+    const desc = s.desc || TEXTS.details_label;
+    const link = s.link || "https://agricoop.nic.in/";
+
     box.innerHTML += `<div class="scheme-card">
         <div class="scheme-info">
-          <h3>${s}</h3>
-          <p>${TEXTS.details_label}</p>
+          <h3>${name}</h3>
+          <p>${desc}</p>
+          <a href="${link}" target="_blank" style="display:inline-block; margin-top:8px; color:#256a24; font-weight:bold; text-decoration:none;">
+            🌐 ${TEXTS.official_site} &rarr;
+          </a>
         </div>
     </div>`;
   });

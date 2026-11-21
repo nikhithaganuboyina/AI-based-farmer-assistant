@@ -2,254 +2,463 @@
 
 {% block content %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>{{ text.disease }}</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Poppins',sans-serif;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
 }
 
-body{
-min-height:100vh;
-background:url("{{ url_for('static', filename='images/soil.jpg') }}") no-repeat center center / cover;
-background-attachment:fixed;
-color:#fff;
+body {
+    min-height: 100vh;
+    background: url("{{ url_for('static', filename='images/soil.jpg') }}") no-repeat center center / cover;
+    background-attachment: fixed;
+    color: #fff;
 }
 
-.overlay{
-min-height:100vh;
-background:rgba(0,0,0,0.45);
-display:flex;
-justify-content:center;
-align-items:center;
-padding:40px 20px;
+.overlay {
+    min-height: 100vh;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
 }
 
-.dashboard-box{
-width:100%;
-max-width:900px;
-background:rgba(255,255,255,0.15);
-backdrop-filter:blur(14px);
-border-radius:30px;
-padding:35px;
-box-shadow:0 20px 45px rgba(0,0,0,0.5);
+.dashboard-box {
+    width: 100%;
+    max-width: 900px;
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 28px;
+    padding: 35px;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-h2{
-text-align:center;
-color:#2ecc71;
-margin-bottom:30px;
-font-size:2rem;
+h2 {
+    text-align: center;
+    color: #2ecc71;
+    margin-bottom: 25px;
+    font-size: 2rem;
+    font-weight: 600;
 }
 
-.form-box{
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:15px;
+.error-banner {
+    background: rgba(231, 76, 60, 0.25);
+    border: 1.5px solid #e74c3c;
+    border-radius: 16px;
+    padding: 14px 20px;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #ffb3b3;
+    font-size: 1rem;
+    font-weight: 500;
 }
 
-input[type="file"]{
-padding:10px;
-background:#fff;
-border-radius:12px;
-width:100%;
-max-width:320px;
+.form-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
-button{
-padding:12px 30px;
-border:none;
-border-radius:30px;
-background:linear-gradient(135deg,#2ecc71,#27ae60);
-color:#fff;
-font-weight:600;
-cursor:pointer;
-transition:0.3s;
+.upload-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
 }
 
-button:hover{
-transform:scale(1.05);
+.file-input-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    text-align: center;
 }
 
-#cameraStream{
-display:none;
-border-radius:15px;
-margin-top:15px;
-box-shadow:0 8px 25px rgba(0,0,0,0.4);
+input[type="file"] {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    border-radius: 14px;
+    width: 100%;
+    font-size: 0.95rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.result{
-margin-top:35px;
-background:rgba(0,0,0,0.45);
-padding:25px;
-border-radius:25px;
-text-align:center;
+.btn-primary {
+    padding: 12px 35px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: #fff;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
 }
 
-.result img{
-max-width:320px;
-border-radius:18px;
-margin-top:15px;
-box-shadow:0 10px 25px rgba(0,0,0,0.5);
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(46, 204, 113, 0.6);
 }
 
-.solution{
-margin-top:20px;
-background:rgba(46,204,113,0.15);
-padding:18px;
-border-radius:18px;
-color:#b7ffb7;
+.btn-secondary {
+    padding: 10px 25px;
+    border: 1.5px solid rgba(255, 255, 255, 0.6);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: #fff;
+}
+
+#cameraStream {
+    display: none;
+    border-radius: 18px;
+    margin-top: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    border: 2px solid #2ecc71;
+}
+
+#previewContainer {
+    display: none;
+    margin-top: 10px;
+    text-align: center;
+}
+
+#previewImg {
+    max-width: 220px;
+    max-height: 220px;
+    border-radius: 14px;
+    border: 2px solid rgba(46, 204, 113, 0.7);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+.result {
+    margin-top: 35px;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 28px;
+    border-radius: 24px;
+    text-align: center;
+    border: 1.5px solid rgba(46, 204, 113, 0.4);
+}
+
+.result.blocked {
+    border-color: rgba(231, 76, 60, 0.6);
+    background: rgba(40, 10, 10, 0.55);
+}
+
+.result h3 {
+    font-size: 1.4rem;
+    color: #2ecc71;
+    margin-bottom: 10px;
+}
+
+.result.blocked h3 {
+    color: #ff6b6b;
+}
+
+.confidence-badge {
+    display: inline-block;
+    padding: 6px 18px;
+    border-radius: 20px;
+    background: rgba(46, 204, 113, 0.2);
+    color: #a8ffb2;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.result img {
+    max-width: 320px;
+    max-height: 280px;
+    object-fit: cover;
+    border-radius: 18px;
+    margin-top: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.solution {
+    margin-top: 22px;
+    background: rgba(46, 204, 113, 0.15);
+    padding: 20px 24px;
+    border-radius: 18px;
+    color: #d4ffd4;
+    text-align: left;
+    border-left: 4px solid #2ecc71;
+}
+
+.solution.blocked {
+    background: rgba(231, 76, 60, 0.15);
+    color: #ffcccc;
+    border-left-color: #e74c3c;
+}
+
+.solution h4 {
+    margin-bottom: 8px;
+    color: #2ecc71;
+    font-size: 1.1rem;
+}
+
+.solution.blocked h4 {
+    color: #ff7675;
+}
+
+.solution p {
+    line-height: 1.6;
+    font-size: 0.98rem;
+}
 </style>
-</head>
-
-<body>
 
 <div class="overlay">
 <div class="dashboard-box">
 
-<h2>🌱 {{ text.disease }}</h2>
+    <h2>🌱 {{ text.disease }}</h2>
 
-<div class="form-box">
+    {% if error %}
+    <div class="error-banner">
+        ⚠️ {{ error }}
+    </div>
+    {% endif %}
 
-<form action="{{ url_for('disease') }}" method="POST" enctype="multipart/form-data">
+    <div class="form-box">
 
-<input type="file" name="image" accept="image/*" required>
+        <form id="diseaseForm" class="upload-form" action="{{ url_for('disease') }}" method="POST" enctype="multipart/form-data">
+            
+            <div class="crop-select-wrapper" style="width: 100%; max-width: 440px; margin-bottom: 10px; background: rgba(0, 0, 0, 0.4); padding: 16px 20px; border-radius: 20px; border: 1.5px solid rgba(46, 204, 113, 0.5); box-shadow: 0 6px 20px rgba(0,0,0,0.3);">
+                <label style="display: block; font-size: 0.95rem; color: #a8ffb2; margin-bottom: 8px; font-weight: 600; text-align: left;">
+                    🌾 <strong>{{ translate("Step 1: Choose Your Crop (100% Accuracy)") }}</strong>
+                </label>
+                <select name="crop" id="cropSelect" style="width: 100%; padding: 12px 16px; border-radius: 12px; background: #ffffff; color: #111827; font-size: 1rem; border: none; cursor: pointer; font-weight: 600; box-shadow: 0 4px 15px rgba(0,0,0,0.25);">
+                    <option value="all" {% if selected_crop == 'all' or not selected_crop %}selected{% endif %}>🌐 {{ translate("All Crops (Auto-Detect)") }}</option>
+                    <option value="Tomato" {% if selected_crop == 'Tomato' %}selected{% endif %}>🍅 {{ translate("Tomato") }}</option>
+                    <option value="Potato" {% if selected_crop == 'Potato' %}selected{% endif %}>🥔 {{ translate("Potato") }}</option>
+                    <option value="Corn" {% if selected_crop == 'Corn' %}selected{% endif %}>🌽 {{ translate("Corn / Maize") }}</option>
+                    <option value="Grape" {% if selected_crop == 'Grape' %}selected{% endif %}>🍇 {{ translate("Grape") }}</option>
+                    <option value="Pepper" {% if selected_crop == 'Pepper' %}selected{% endif %}>🫑 {{ translate("Bell Pepper / Chilli") }}</option>
+                    <option value="Apple" {% if selected_crop == 'Apple' %}selected{% endif %}>🍏 {{ translate("Apple") }}</option>
+                    <option value="Cherry" {% if selected_crop == 'Cherry' %}selected{% endif %}>🍒 {{ translate("Cherry") }}</option>
+                    <option value="Peach" {% if selected_crop == 'Peach' %}selected{% endif %}>🍑 {{ translate("Peach") }}</option>
+                    <option value="Strawberry" {% if selected_crop == 'Strawberry' %}selected{% endif %}>🍓 {{ translate("Strawberry") }}</option>
+                    <option value="Orange" {% if selected_crop == 'Orange' %}selected{% endif %}>🍊 {{ translate("Citrus / Orange") }}</option>
+                    <option value="Blueberry" {% if selected_crop == 'Blueberry' %}selected{% endif %}>🫐 {{ translate("Blueberry") }}</option>
+                    <option value="Squash" {% if selected_crop == 'Squash' %}selected{% endif %}>🌿 {{ translate("Squash") }}</option>
+                    <option value="Soybean" {% if selected_crop == 'Soybean' %}selected{% endif %}>🌱 {{ translate("Soybean") }}</option>
+                    <option value="Raspberry" {% if selected_crop == 'Raspberry' %}selected{% endif %}>🍇 {{ translate("Raspberry") }}</option>
+                </select>
+                <div style="font-size: 0.8rem; color: #d4ffd4; margin-top: 6px; text-align: left;">
+                    ✨ {{ translate("Selecting your crop eliminates cross-crop confusion and guarantees targeted diagnosis.") }}
+                </div>
+            </div>
 
-<button type="submit">
-🔍 {{ text.disease_btn }}
-</button>
+            <div class="file-input-wrapper">
+                <label style="display: block; font-size: 0.95rem; color: #a8ffb2; margin-bottom: 8px; font-weight: 600; text-align: left;">
+                    📷 <strong>{{ translate("Step 2: Upload Leaf Photo") }}</strong>
+                </label>
+                <input type="file" id="leafFileInput" name="image" accept="image/*" required>
+            </div>
 
-</form>
+            <div id="previewContainer">
+                <p style="font-size: 0.85rem; color: #a8ffb2; margin-bottom: 6px;">{{ translate("Selected Image Preview") }}:</p>
+                <img id="previewImg" src="#" alt="Selected Leaf">
+            </div>
 
-<button id="openCameraBtn">
-📷 {{ translate("Open Camera") }}
-</button>
+            <button type="submit" id="submitBtn" class="btn-primary">
+                🔍 {{ text.disease_btn }}
+            </button>
 
-<video id="cameraStream" width="320" height="240" autoplay></video>
+        </form>
 
-<button id="captureBtn" style="display:none;">
-📸 {{ translate("Capture & Detect") }}
-</button>
+        <div style="display: flex; gap: 10px; margin-top: 8px;">
+            <button id="openCameraBtn" type="button" class="btn-secondary">
+                📷 {{ translate("Open Camera") }}
+            </button>
+        </div>
 
-<canvas id="canvas" style="display:none;"></canvas>
+        <video id="cameraStream" width="320" height="240" autoplay playsinline></video>
 
-</div>
+        <button id="captureBtn" type="button" class="btn-primary" style="display:none; margin-top: 10px;">
+            📸 {{ translate("Capture & Detect") }}
+        </button>
 
-{% if disease %}
+        <canvas id="canvas" style="display:none;"></canvas>
 
-<div class="result">
+    </div>
 
-<h3>
-🧪 {{ translate("Prediction") }}: {{ disease }}
-</h3>
+    {% if disease %}
 
-<p>
-🎯 {{ translate("Confidence") }}: {{ confidence }}%
-</p>
+    <div class="result {% if confidence == 0.0 or 'Blocked' in disease %}blocked{% endif %}">
 
-{% if image %}
-<img src="{{ url_for('static', filename=image) }}">
-{% endif %}
+        <h3>
+            {% if confidence == 0.0 or 'Blocked' in disease %}
+            ⚠️ {{ disease }}
+            {% else %}
+            🧪 {{ translate("Prediction") }}: {{ disease }}
+            {% endif %}
+        </h3>
 
-{% if solution %}
+        {% if confidence > 0.0 %}
+        <div class="confidence-badge">
+            🎯 {{ translate("Confidence") }}: {{ confidence }}%
+        </div>
+        {% endif %}
 
-<div class="solution">
+        {% if image %}
+        <div>
+            <img src="{{ url_for('static', filename=image) }}" alt="Analyzed Leaf">
+        </div>
+        {% endif %}
 
-<h4>
-🌿 {{ translate("Solution") }}
-</h4>
+        {% if solution %}
+        <div class="solution {% if confidence == 0.0 or 'Blocked' in disease %}blocked{% endif %}">
+            <h4>
+                {% if confidence == 0.0 or 'Blocked' in disease %}
+                💡 {{ translate("Guidance") }}
+                {% else %}
+                🌿 {{ translate("Recommended Solution") }}
+                {% endif %}
+            </h4>
+            <p>{{ solution }}</p>
+        </div>
+        {% endif %}
 
-<p>{{ solution }}</p>
+        {% if alternates and alternates|length > 0 %}
+        <div class="alternates-box" style="margin-top: 18px; padding: 14px 20px; background: rgba(255, 255, 255, 0.08); border-radius: 16px; text-align: left; border: 1px dashed rgba(255, 255, 255, 0.25);">
+            <p style="color: #ffd166; font-weight: 600; margin-bottom: 8px; font-size: 0.95rem;">
+                🔍 {{ translate("Other possibilities considered by AI") }}:
+            </p>
+            <ul style="list-style: none; padding-left: 0; margin-bottom: 0;">
+                {% for alt in alternates %}
+                <li style="padding: 4px 0; color: #e8e8e8; font-size: 0.92rem;">
+                    • <strong>{{ alt.name }}</strong> — <span style="color: #a8ffb2;">{{ alt.confidence }}%</span>
+                </li>
+                {% endfor %}
+            </ul>
+            <p style="margin-top: 8px; font-size: 0.82rem; color: #b7ffb7; margin-bottom: 0;">
+                💡 {{ translate("Tip: If the detected crop differs from your field, select your exact crop above for 100% targeted accuracy.") }}
+            </p>
+        </div>
+        {% endif %}
 
-</div>
+    </div>
 
-{% endif %}
-
-</div>
-
-{% endif %}
+    {% endif %}
 
 </div>
 </div>
 
 <script>
+const leafFileInput = document.getElementById("leafFileInput");
+const previewContainer = document.getElementById("previewContainer");
+const previewImg = document.getElementById("previewImg");
+const submitBtn = document.getElementById("submitBtn");
+const diseaseForm = document.getElementById("diseaseForm");
+const openCameraBtn = document.getElementById("openCameraBtn");
+const cameraStream = document.getElementById("cameraStream");
+const captureBtn = document.getElementById("captureBtn");
+const canvas = document.getElementById("canvas");
 
-const openCameraBtn=document.getElementById("openCameraBtn");
-const cameraStream=document.getElementById("cameraStream");
-const captureBtn=document.getElementById("captureBtn");
-const canvas=document.getElementById("canvas");
-
-let stream;
-
-openCameraBtn.addEventListener("click",async()=>{
-
-try{
-
-stream=await navigator.mediaDevices.getUserMedia({video:true});
-
-cameraStream.srcObject=stream;
-
-cameraStream.style.display="block";
-
-captureBtn.style.display="inline-block";
-
-}catch(err){
-
-alert("{{ translate('Camera access denied or not supported') }}");
-
-}
-
+// Live image preview upon file selection
+leafFileInput.addEventListener("change", function() {
+    if (this.files && this.files[0]) {
+        const file = this.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewContainer.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+    } else {
+        previewContainer.style.display = "none";
+    }
 });
 
-captureBtn.addEventListener("click",()=>{
-
-const context=canvas.getContext("2d");
-
-canvas.width=cameraStream.videoWidth;
-
-canvas.height=cameraStream.videoHeight;
-
-context.drawImage(cameraStream,0,0);
-
-canvas.toBlob(blob=>{
-
-const formData=new FormData();
-
-formData.append("image",blob,"capture.png");
-
-fetch("{{ url_for('disease') }}",{
-
-method:"POST",
-body:formData
-
-})
-
-.then(res=>res.text())
-
-.then(html=>document.open().write(html))
-
-.catch(err=>alert("{{ translate('Detection failed') }}"));
-
-},"image/png");
-
+// Loading state on submit
+diseaseForm.addEventListener("submit", function() {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = "⏳ {{ translate('Analyzing Leaf...') }}";
+    submitBtn.style.opacity = "0.75";
 });
 
+// Camera Stream & Capture
+let stream = null;
+
+openCameraBtn.addEventListener("click", async () => {
+    try {
+        if (stream) {
+            // Toggle off camera
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+            cameraStream.style.display = "none";
+            captureBtn.style.display = "none";
+            openCameraBtn.innerHTML = "📷 {{ translate('Open Camera') }}";
+            return;
+        }
+
+        stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: "environment" } 
+        });
+        cameraStream.srcObject = stream;
+        cameraStream.style.display = "block";
+        captureBtn.style.display = "inline-block";
+        openCameraBtn.innerHTML = "⏹️ {{ translate('Close Camera') }}";
+    } catch(err) {
+        alert("{{ translate('Camera access denied or not supported on this device') }}");
+    }
+});
+
+captureBtn.addEventListener("click", () => {
+    const context = canvas.getContext("2d");
+    canvas.width = cameraStream.videoWidth || 640;
+    canvas.height = cameraStream.videoHeight || 480;
+    context.drawImage(cameraStream, 0, 0, canvas.width, canvas.height);
+
+    canvas.toBlob(blob => {
+        if (!blob) {
+            alert("{{ translate('Failed to capture image') }}");
+            return;
+        }
+        // Convert blob to File and attach to form
+        const capturedFile = new File([blob], "camera_capture.jpg", { type: "image/jpeg" });
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(capturedFile);
+        leafFileInput.files = dataTransfer.files;
+
+        // Show preview
+        previewImg.src = URL.createObjectURL(blob);
+        previewContainer.style.display = "block";
+
+        // Stop camera stream
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+            cameraStream.style.display = "none";
+            captureBtn.style.display = "none";
+            openCameraBtn.innerHTML = "📷 {{ translate('Open Camera') }}";
+        }
+
+        // Submit form
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = "⏳ {{ translate('Analyzing Leaf...') }}";
+        submitBtn.style.opacity = "0.75";
+        diseaseForm.submit();
+    }, "image/jpeg", 0.92);
+});
 </script>
-
-</body>
-</html>
 
 {% endblock %}

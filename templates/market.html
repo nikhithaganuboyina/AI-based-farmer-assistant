@@ -143,7 +143,13 @@ font-size:18px;
 <br>
 
 <button class="loc-btn" onclick="searchPlaceMarkets()">
-🔍 Search Markets
+🔍 Search OpenStreetMap
+</button>
+
+<div style="margin: 20px 0; font-size: 14px; opacity: 0.8;">— OR —</div>
+
+<button class="loc-btn" style="background:#3498db;" onclick="findMyMarkets()">
+📍 Find My Nearby Markets
 </button>
 
 </div>
@@ -159,98 +165,101 @@ font-size:18px;
 
 <script>
 
-/* SEARCH MARKETS BY PLACE */
+/* GEOLOCATION + LOCAL DATABASE */
+
+async function findMyMarkets() {
+    const marketList = document.getElementById("marketList");
+    const loading = document.getElementById("loading");
+
+    if (!navigator.geolocation) {
+        loading.innerHTML = "❌ Geolocation is not supported by your browser";
+        return;
+    }
+
+    marketList.innerHTML = "";
+    loading.innerHTML = "📍 Getting your location...";
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        
+        loading.innerHTML = "🌾 Finding nearby markets...";
+
+        try {
+            const res = await fetch(`/get-nearby-markets?lat=${lat}&lng=${lon}`);
+            const data = await res.json();
+            
+            loading.innerHTML = "";
+
+            if (data.error || data.length === 0) {
+                loading.innerHTML = "❌ No markets found nearby";
+                return;
+            }
+
+            data.forEach(m => {
+                const div = document.createElement("div");
+                div.className = "market-card";
+                div.innerHTML = `
+                <h4>${m.market_name}</h4>
+                <p><strong>District:</strong> ${m.district}, ${m.state}</p>
+                <p><strong>Distance:</strong> ${m.distance_km} km</p>
+                <a href="https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}" target="_blank" style="color:#2ecc71; text-decoration:none; display:inline-block; margin-top:10px;">📌 View on Map</a>
+                `;
+                marketList.appendChild(div);
+            });
+
+        } catch (error) {
+            loading.innerHTML = "⚠️ Error fetching markets";
+            console.error(error);
+        }
+    }, () => {
+        loading.innerHTML = "❌ Location access denied. Please allow location access.";
+    });
+}
+
+/* SEARCH MARKETS BY PLACE (OPENSTREETMAP) */
 
 async function searchPlaceMarkets(){
+    const place = document.getElementById("placeName").value.trim();
+    const marketList = document.getElementById("marketList");
+    const loading = document.getElementById("loading");
 
-const place = document.getElementById("placeName").value;
+    if(!place){
+        alert("Please enter a place name");
+        return;
+    }
 
-const marketList = document.getElementById("marketList");
-const loading = document.getElementById("loading");
+    marketList.innerHTML = "";
+    loading.innerHTML = `🌾 Searching agricultural markets for "${place}"...`;
 
-if(!place){
+    try {
+        const res = await fetch(`/search-place-markets?place=${encodeURIComponent(place)}`);
+        const data = await res.json();
 
-alert("Please enter a place name");
-return;
+        loading.innerHTML = "";
 
-}
+        if(!data || !Array.isArray(data) || data.length === 0){
+            loading.innerHTML = `❌ No nearby agricultural markets found for "${place}"`;
+            return;
+        }
 
-marketList.innerHTML = "";
-loading.innerHTML = "🌾 Searching agricultural markets...";
-
-
-try{
-
-/* GET PLACE COORDINATES */
-
-const geoUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${place}`;
-
-const geoRes = await fetch(geoUrl);
-
-const geoData = await geoRes.json();
-
-if(geoData.length === 0){
-
-loading.innerHTML = "❌ Place not found";
-return;
-
-}
-
-const lat = geoData[0].lat;
-const lon = geoData[0].lon;
-
-
-/* FETCH MARKETS */
-
-const overpassUrl = `https://overpass-api.de/api/interpreter?data=[out:json];(
-node(around:7000,${lat},${lon})["amenity"="marketplace"];
-node(around:7000,${lat},${lon})["shop"="farm"];
-);out;`;
-
-const res = await fetch(overpassUrl);
-
-const data = await res.json();
-
-loading.innerHTML = "";
-
-if(data.elements.length === 0){
-
-loading.innerHTML = "❌ No nearby agricultural markets found";
-return;
-
-}
-
-
-/* DISPLAY MARKETS */
-
-data.elements.slice(0,10).forEach(m=>{
-
-const name = m.tags.name || "Agricultural Market";
-
-const div = document.createElement("div");
-
-div.className = "market-card";
-
-div.innerHTML = `
-<h4>${name}</h4>
-<p><strong>Place:</strong> ${place}</p>
-<p><strong>Latitude:</strong> ${m.lat}</p>
-<p><strong>Longitude:</strong> ${m.lon}</p>
-`;
-
-marketList.appendChild(div);
-
-});
-
-}
-
-catch(error){
-
-loading.innerHTML = "⚠️ Error fetching markets";
-console.log(error);
-
-}
-
+        data.forEach(m => {
+            const div = document.createElement("div");
+            div.className = "market-card";
+            const distText = (typeof m.distance_km === 'number') ? `${m.distance_km} km` : m.distance_km;
+            div.innerHTML = `
+            <h4>${m.market_name}</h4>
+            <p><strong>District:</strong> ${m.district}, ${m.state}</p>
+            <p><strong>Address:</strong> ${m.address}</p>
+            ${distText ? `<p><strong>Distance:</strong> ${distText}</p>` : ''}
+            <a href="https://www.google.com/maps/search/?api=1&query=${m.lat},${m.lng}" target="_blank" style="color:#2ecc71; text-decoration:none; display:inline-block; margin-top:10px; font-weight:600;">📌 View on Map &rarr;</a>
+            `;
+            marketList.appendChild(div);
+        });
+    } catch(err) {
+        loading.innerHTML = "⚠️ Error fetching markets. Please try again.";
+        console.error("Market search error:", err);
+    }
 }
 
 </script>
