@@ -12,7 +12,7 @@ from werkzeug.utils import secure_filename
 import uuid
 from predict_disease import predict_disease
 from utils.disease_solutions import get_disease_solution
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from deep_translator import GoogleTranslator
 from utils.translator import translate_text
@@ -45,11 +45,8 @@ df_markets_loc = pd.read_csv("data/markets_location.csv")
 chat_questions = df_chatbot["question"].tolist()
 chat_answers = df_chatbot["answer"].tolist()
 
-try:
-    chat_model = SentenceTransformer('all-MiniLM-L6-v2', local_files_only=True)
-except Exception:
-    chat_model = SentenceTransformer('all-MiniLM-L6-v2')
-chat_embeddings = chat_model.encode(chat_questions)
+chat_vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
+chat_embeddings = chat_vectorizer.fit_transform(chat_questions)
 
 SUPPORTED_LANGUAGES = ["en", "ml", "ta", "te", "kn", "hi"]
 
@@ -683,7 +680,7 @@ def chatbot_reply(user_text, lang="en"):
 
         # Fallback to CSV if Gemini did not return an answer
         if not answer_en:
-            user_embedding = chat_model.encode([user_text_en])
+            user_embedding = chat_vectorizer.transform([user_text_en])
             scores = cosine_similarity(user_embedding, chat_embeddings)[0]
             best_idx = scores.argmax()
             answer_en = chat_answers[best_idx]

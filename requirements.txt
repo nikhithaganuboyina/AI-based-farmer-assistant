@@ -9,7 +9,6 @@ pandas
 scikit-learn
 google-generativeai
 python-dotenv
-sentence-transformers
 deep-translator
 feedparser
 gunicorn
